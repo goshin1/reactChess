@@ -1,0 +1,46 @@
+#popupback{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: rgba(0,0,0,0.3);
+    z-index: 1;
+}
+
+#popup{
+    margin: 130px auto;
+    width: 350px;
+    height: 250px;
+    text-align: center;
+    background-color: rgb(57, 57, 57);
+    position: relative;
+    border-radius: 30px;
+}
+
+#popup p{
+    margin: auto;
+    padding-top: 70px;
+    width: 80%;
+    font-size: 18px;
+    font-weight: bold;
+    color: rgb(255,255,255);
+    position: relative;
+}
+
+#popup > input{
+    margin-top: 20px;
+    width: 250px;
+    height: 40px;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    color: rgb(57, 57, 57);
+    cursor: pointer;
+    transition: all 0.3s;
+    background-color: rgb(206, 206, 206);
+}
+
+#popup > input:active{
+    border: 2px solid rgb(206, 206, 206);
+    color: rgb(206, 206, 206);
+    background-color: rgb(57, 57, 57)
+}
