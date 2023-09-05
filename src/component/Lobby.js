@@ -1,11 +1,12 @@
 import './lobby.css'
-import { useLocation, Link } from 'react-router-dom'
+import { useLocation, Link, useNavigate } from 'react-router-dom'
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 
 export default function Lobby(){
     const location = useLocation();
     const profile = location.state.profile;
+    const navigate = useNavigate();
     const [room, setRoom] = useState([]);
     const [chat, setChat] = useState([]);
 
@@ -34,7 +35,15 @@ export default function Lobby(){
                 for(let i = 0; i < res.data.length; i++){
                     temp.push(
                         <div key={`chat${i}`} className='chatBlock'>
-                            {res.data[i].nickname} | {res.data[i].commend}
+                            <div className='chatName'>
+                                {res.data[i].nickname}
+                            </div>
+                            <div className='chatCommend'>
+                                {res.data[i].commend}
+                            </div>
+                            <div className='chatTime'>
+                                {res.data[i].time.split(' ')[1]}
+                            </div>
                         </div>
                     )
                 }
@@ -57,7 +66,13 @@ export default function Lobby(){
                             <div className='roomName'>
                                 {res.data[i].roomname}
                             </div>
-                            <div className='roomButton'>
+                            <div className='roomButton' onClick={res.data[i].player_second !== 'none' ? ()=>{console.log('불가')} : () => {
+                                navigate('/play',{
+                                    state : {
+                                        
+                                    }
+                                })
+                            }}>
 
                             </div>
                         </div>
@@ -117,11 +132,18 @@ export default function Lobby(){
                 <div id='chatInsert'>
                     <input type='text' name='chat' onKeyUp={(event) => {
                         if(event.code === 'Enter'){
+                            let time = new Date();
                             axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}chat`, {
                                 data : {
-                                    
+                                    id : profile.id,
+                                    chatgroup : 0,
+                                    nickname : profile.nickname,
+                                    commend : event.target.value,
+                                    time : time.getFullYear() + '/' + (time.getMonth() + 1) + "/" + time.getDay() + " " +
+                                        time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds()
                                 }
                             })
+                            return
                         }
                     }}/>
                 </div>

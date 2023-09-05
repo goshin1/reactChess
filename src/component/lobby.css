@@ -227,13 +227,33 @@
 }
 
 .chatBlock{
-    margin: 5px auto;
-    padding-top: 10px;
+    margin: 0px auto;
+    padding: 5px 15px;
     width: 90%;
-    height: 25px;
-    font-size: 12px;
-    text-indent: 5px;
+    line-height: 20px;
+    height: auto;
+    clear: both;
+    word-wrap: break-word;
+    display: inline-block;
+    font-size: 11px;
     border-bottom: 1px solid black;
+}
+
+.chatBlock > div{
+    float: left;
     word-break: break-all;
     word-wrap: break-word;
+}
+
+.chatName{
+    width: 20%;
+}
+
+.chatCommend{
+    width: 60%;
+    text-indent: 10px;
+}
+
+.chatTime{
+    width: 20%;
 }

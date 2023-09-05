@@ -26,6 +26,7 @@
     color: rgb(246, 238, 227);
     font-size: 30px;
     font-weight: bold;
+    text-align: center;
 }
 
 #chessBoard{
@@ -100,6 +101,7 @@
     font-weight: bold;
     color: rgb(97, 97, 97);
     transition: all 0.2s;
+    display: block;
 }
 
 #stopBtn:active{
