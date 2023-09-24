@@ -22,7 +22,7 @@ export default function Sign(){
     <div id="insertForm">
         <div id='popupback' style={{display : popup === 0 ? 'none' : 'block'}}>
             <div id='popup'>
-                <p>{popupMessage[popup]}</p>
+                <p id='popupP'>{popupMessage[popup]}</p>
                 <input type='button' value='닫기' onClick={()=>{setPopup(0)}}/>
             </div>
         </div>

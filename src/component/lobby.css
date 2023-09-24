@@ -20,7 +20,7 @@
 #profileBox{
     margin: 50px auto 20px;
     min-width: 280px;
-    width: 50%;
+    width: 60%;
     height: 25%;
     background-color: rgb(57, 57, 57);
     color: rgb(224, 224, 224);
@@ -31,20 +31,73 @@
 #profileBox > div{
     width: 100%;
     height: 50%;
-    font-size: 25px;
+    float: left;
     font-weight: bold;
     text-align: center;
+    background-color: rgb(57, 57, 57);
+    border-radius: 25px;
+    transition: all 0.2s;
+}
+
+#profileOver > div{
+    width: 50%;
+    height: 100%;
+    float: left;
 }
 
 #profileDetail{
-    padding-top: 20px;
+    padding-top: 25px;
+    font-size: 120%;
 }
 
+#profileUnder{
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+#profileUnder input[type=button]{
+    margin: 5%;
+    width: 40%;
+    height: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    border: 2px solid rgb(206, 206, 206);
+    border-radius: 10px;
+    color: rgb(206, 206, 206);
+    background-color: rgb(57, 57, 57);
+    cursor: pointer;
+}
+
+#createRoom{
+    margin-top: 20px;
+    width: 100%;
+    height: 80px;
+}
+
+#createRoom input[type=text]{
+    margin-top: 30px;
+    margin-left: 12px;
+    width: 55%;
+    height: 25px;
+    display: block;
+    border: 2px solid rgb(206, 206, 206);
+    background-color: rgb(57, 57, 57);
+    border-radius: 5px;
+    color: rgb(206, 206, 206);
+    text-indent: 5px;
+}
+
+#createRoom input[type=button]{
+    margin: -40px 10px;
+    width: 30%;
+    display: block;
+    float: right;
+}
 
 #levelsBar{
-    margin: -10px auto;
-    width: 80%;
-    height: 50%;
+    margin: 20px 0px;
+    width : 90%;
+    height: 40%;
     border-radius: 10px;
     background-color: rgb(224, 224, 224);
     position: relative;
@@ -62,7 +115,7 @@
 #roomList{
     margin: 0px auto;
     min-width: 280px;
-    width: 50%;
+    width: 60%;
     height: 50%;
     overflow-y: auto;
     position: relative;
@@ -131,7 +184,7 @@
 #chessChat{
     bottom: 0px;
     min-width: 280px;
-    width: 50%;
+    width: 60%;
     height: 180px;
     border-radius: 10px;
     background-color: rgb(57, 57, 57);
@@ -164,7 +217,13 @@
 
 @media screen and (min-width: 600px) {
     #chessChat{
-        left: 20%;
+        left: 12.5%;
+    }
+}
+
+@media screen and (min-width: 620px) {
+    #chessChat{
+        left: 15%;
     }
 }
 
@@ -174,9 +233,15 @@
     }
 }
 
+@media screen and (min-width: 745px) {
+    #chessChat{
+        left: 19.7%;
+    }
+}
+
 @media screen and (min-width: 900px) {
     #chessChat{
-        left: 25%;
+        left: 20%;
     }
 }
 
@@ -227,8 +292,8 @@
 }
 
 .chatBlock{
-    margin: 0px auto;
-    padding: 5px 15px;
+    margin: 2px 5% 2px;
+    padding: 5px 0px;
     width: 90%;
     line-height: 20px;
     height: auto;
@@ -247,6 +312,7 @@
 
 .chatName{
     width: 20%;
+    cursor: pointer;
 }
 
 .chatCommend{
