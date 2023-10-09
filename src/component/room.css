@@ -148,4 +148,34 @@
     float: right;
     border: none;
     border-radius: 5px;
+    cursor: pointer;
+}
+
+#banPopup{
+    max-width: 280px;
+    padding-top: 20px;
+    margin-top: -47px;
+    width: 100%;
+    height: 48px;
+    background-color: rgb(246, 238, 227);
+    border: 2px solid rgb(57, 57, 57);
+    color: rgb(57,57,57);
+    position: absolute;
+    border-radius: 20px;
+    font-size: 15px;
+    line-height: 30px;
+    transition: all 1s;
+}
+
+#banPopup > input[type=button]{
+    margin: 0px 5px;
+    width: 20%;
+    height: 30px;
+    display: block;
+    border: none;
+    background-color: rgb(57, 57, 57);
+    color: rgb(206, 206, 206);
+    float: right;
+    border-radius: 5px;
+    cursor: pointer;
 }

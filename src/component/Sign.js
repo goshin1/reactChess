@@ -12,10 +12,9 @@ export default function Sign(){
         2 : '비밀번호를 입력해주세요.',
         3 : '비밀번호 확인란을 입력해주세요',
         4 : '이메일을 입력해주세요.',
-        5 : '닉네임을 입력해주세요',
-        6 : '비밀번호가 일치하지 않습니다',
-        7 : '이메일양식이 맞지 않습니다',
-        8 : '이미있는 아이디입니다'
+        5 : '비밀번호가 일치하지 않습니다',
+        6 : '이메일양식이 맞지 않습니다',
+        7 : '이미있는 아이디입니다'
     }
 
     return <div id="insertBack">
@@ -37,13 +36,11 @@ export default function Sign(){
         <input className="inputBlock" type="password" name="password" placeholder='Pwd'/>
         <input className="inputBlock" type="password" name="passwordCh" placeholder='Pwd Ch'/>
         <input className="inputBlock" type="text" name="email" placeholder='E-mail'/>
-        <input className="inputBlock" type="text" name="nickname" placeholder='Nickname'/>
         <input className="inputBlock" type='button' value='Sign' onClick={()=>{
             let id = document.getElementsByName('id')[0].value;
             let pwd = document.getElementsByName('password')[0].value;
             let pwdch = document.getElementsByName('passwordCh')[0].value;
             let email = document.getElementsByName('email')[0].value;
-            let nickname = document.getElementsByName('nickname')[0].value;
             if(id === ''){
                 setPopup(1)
                 return
@@ -60,16 +57,12 @@ export default function Sign(){
                 setPopup(4)
                 return
             }
-            if(nickname === ''){
+            if(pwd !== pwdch){
                 setPopup(5)
                 return
             }
-            if(pwd !== pwdch){
-                setPopup(6)
-                return
-            }
             if(email.indexOf('@') === -1 || email.indexOf('.') === -1 || email.indexOf('@') + 3 > email.indexOf('.')){
-                setPopup(7)
+                setPopup(6)
                 return
             }
 
@@ -82,7 +75,7 @@ export default function Sign(){
             })
             console.log(duplic)
             if(duplic === 'fail'){
-                setPopup(8)
+                setPopup(7)
                 return
             }
 
@@ -90,8 +83,7 @@ export default function Sign(){
                 data : {
                     id : id,
                     pwd : pwd,
-                    email : email,
-                    nickname : nickname
+                    email : email
                 }
             })
 

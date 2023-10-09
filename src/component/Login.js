@@ -62,7 +62,6 @@ export default function Login(){
                 })
             }}/>
             <Link to='/sign' className="inputBlock">Sign</Link>
-            
         </div>
     </div>
 }

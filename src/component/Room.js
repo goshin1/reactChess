@@ -10,9 +10,12 @@ export default function Room(){
     const [roomInfo, setRoomInfo] = useState(location.state.roomInfo);
     const [chat, setChat] = useState([]);
     const [report, setReport] = useState(0);
-    const [ready, setReady] = useState([false, false]);
-    const [color, setColor] = useState([false, true]);
+    const [ready, setReady] = useState([roomInfo.ready_first === 1 ? true : false, roomInfo.ready_second === 1 ? true : false]);
+    const [color, setColor] = useState([roomInfo.player_first === roomInfo.black ? false : true, roomInfo.player_second === roomInfo.black ? false : true]); // false는 흑, true는 백
     const [room, setRoom] = useState();
+    const [ban, setBan] = useState(0);
+    
+    // console.log(roomInfo);
 
     // {   profile
     //     "id": "manager",
@@ -51,10 +54,6 @@ export default function Room(){
     }
 
     useInterval(() => {
-        if (color[0] !== color[1]){
-
-        }
-
         axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}checkRoom`, {
             data : {
                 roomid : roomInfo.roomid
@@ -80,7 +79,7 @@ export default function Room(){
                                 let reportNum = event.target.parentNode.getAttribute('id');
                                 setReport(Number(reportNum))
                             }}>
-                                {res.data[i].nickname}
+                                {res.data[i].id}
                             </div>
                             <div className='chatCommend'>
                                 {res.data[i].commend}
@@ -98,65 +97,30 @@ export default function Room(){
                 }
                 setChat(temp);
             })
+        
+        
+        
 
+        setReady([roomInfo.ready_first === 1 ? true : false, roomInfo.ready_second === 1 ? true : false]);
+        setColor([roomInfo.player_first === roomInfo.black ? false : true, roomInfo.player_second === roomInfo.black ? false : true])
+        
         if(ready[0] === true && ready[1] === true){
-            if(color[0] !== color[1]){
-                if(roomInfo.player_first === roomInfo.black && color[0] === false &&
-                    roomInfo.player_second === roomInfo.white && color[1] === true){ 
-                        navigate('play', {
-                            state : {
-                                profile : profile,
-                                roomInfo : roomInfo
-                            }
-                        });
-                }else if(roomInfo.player_first === roomInfo.white && color[0] === true &&
-                    roomInfo.player_second === roomInfo.black && color[1] === false){
-                        navigate('play', {
-                            state : {
-                                profile : profile,
-                                roomInfo : roomInfo
-                            }
-                        });
-                }else if(roomInfo.player_first !== roomInfo.black && color[0] === false &&
-                    roomInfo.player_second !== roomInfo.white && color[1] === true){  
-                        // 첫번째 플레이어가 검정, 두번째 플레이어가 하양인데 서버에 업데이트가 안 된 경우
-                        axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}updateRoom`, {
-                            data : {
-                                black : roomInfo.player_first,
-                                white : roomInfo.player_second
-                            }
-                        })
-
-                        navigate('play', {
-                            state : {
-                                profile : profile,
-                                roomInfo : roomInfo
-                            }
-                        });
-                }else if(roomInfo.player_first !== roomInfo.white && color[0] === true &&
-                    roomInfo.player_second !== roomInfo.black && color[1] === false){
-                        // 첫번째 플레이어가 하양, 두번째 플레이어가 검정인데 서버에 업데이트가 안 된 경우
-                        axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}updateRoom`, {
-                            data : {
-                                black : roomInfo.player_second,
-                                white : roomInfo.player_first
-                            }
-                        })
-
-                        navigate('play', {
-                            state : {
-                                profile : profile,
-                                roomInfo : roomInfo
-                            }
-                        });
+            let endTime = parseInt(new Date().getTime() / 1000);
+            axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}timeUpdate`, {
+                data : {
+                    who : profile.id === roomInfo.player_first ? 1 : 2,
+                    roomid : roomInfo.roomid,
+                    endTime : endTime
                 }
-
-
-
-            }
+            })
+            navigate('/play', {
+                state : {
+                    profile : profile,
+                    roomInfo : roomInfo
+                }
+            })
         }
-    }, [1000]);
-
+    }, [500]);
     const black = {
         backgroundColor : 'rgb(57, 57, 57)',
         color : 'rgb(206, 206, 206)',
@@ -203,8 +167,40 @@ export default function Room(){
             <div id='roomHead'>
                 <div id='roomTitle'>초보환영</div>
                 <input id='exitRoom' type='button' onClick={() => {
-                    console.log(roomInfo)
-                    
+                    if(roomInfo.player_second === profile.id){ // 두번째 플레이어로서 나갈 경우
+                        axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}exitRoom`, {
+                            data : {
+                                player_first : roomInfo.player_first,
+                                player_second : 'none',
+                                roomid : roomInfo.roomid,
+                                board_num : roomInfo.board_num
+                            }
+                        })
+                    }else if(roomInfo.player_first === profile.id && roomInfo.player_second !== 'none'){ // 첫 번째 플레이어고 
+                        axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}exitRoom`, {
+                            data : {
+                                player_first : 'none',
+                                player_second : roomInfo.player_second,
+                                roomid : roomInfo.roomid,
+                                board_num : roomInfo.board_num
+                            }
+                        })
+                    }else if(roomInfo.player_first === profile.id && roomInfo.player_second === 'none'){
+                        axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}exitRoom`, {
+                            data : {
+                                player_first : 'none',
+                                player_second : 'none',
+                                roomid : roomInfo.roomid,
+                                board_num : roomInfo.board_num
+                            }
+                        })
+                    }
+                    navigate('/lobby', {
+                        state : {
+                            profile : profile
+                        }
+                    })
+                    return                    
                 }}/>
             </div>
             <div id='selectSetting'>
@@ -218,25 +214,95 @@ export default function Room(){
 
 
             <div className='players' id='playerFirst'>
-                <div className='playerName'>12Lv 닉네임</div>
+                <div className='playerName'>
+                    {roomInfo.player_first === profile.id ? profile.id : roomInfo.player_first}
+                </div>
+
                 <input type='button' className='chessColor' style={color[0] === false ? black : white}
-                    onClick={(event)=>{setColor([!color[0], color[1]])}} value={color[0] === false ? '흑' : '백'}
+                    onClick={(event)=>{
+                        let black = roomInfo.black;
+                        let white = roomInfo.white;
+                        if(white === 'none' && black !== 'none'){
+                            if(black === roomInfo.player_first){
+                                white = roomInfo.player_second;
+                            }else if(black === roomInfo.player_second){
+                                white = roomInfo.player_first
+                            }
+                        }else if(black === 'none' && white !== 'none'){
+                            if(white === roomInfo.player_first){
+                                black = roomInfo.player_second
+                            }else if(white === roomInfo.player_second){
+                                black = roomInfo.player_first
+                            }
+                        }
+                        axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}colorChange`, {
+                            data : {
+                                black : white,
+                                white : black,
+                                roomid : roomInfo.roomid
+                            }
+                        })
+                    }} value={
+                        color[0] === false ? '흑' : '백'}
                     disabled={roomInfo.player_first !== profile.id}/>
+                
                 <input className='chessReady' type='button' style={ready[0] === false ? black : white}
                     onClick={(event)=>{ 
-                        setReady([!ready[0], ready[1]])
+                        axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}ready`, {
+                            data : {
+                                who : 1,
+                                ready : ready[0] === true ? 0 : 1,
+                                roomid : roomInfo.roomid
+                            }
+                        })
                     }} value={ready[0] === false ? '준비' : '준비완료'}
                     disabled={roomInfo.player_first !== profile.id}/>
             </div>
 
+
+
             <div className='players' id='playerSecond'>
-                <div className='playerName'>12Lv 닉네임</div>
+                <div className='playerName' onClick={profile.id !== roomInfo.player_first ? () => {} : () => {
+                    if(roomInfo.player_second === 'none')
+                        return
+                    if(ban === 1)
+                        return
+                    setBan(1)
+                }}>
+                    {roomInfo.player_second === profile.id ? profile.id : roomInfo.player_second}
+                    <div id='banPopup' style={ban === 1 ? {
+                        marginLeft : '0px',
+                        opacity : 100
+                    } : {
+                        marginLeft : '-1300px',
+                        opacity : 0
+                    }}>
+                        강퇴하시겠습니까?
+                        <input type='button' value='닫기' onClick={() => {
+                            setBan(0)
+                        }}/>
+                        <input type='button' value='강퇴' onClick={() => {
+                            axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}ban`, {
+                                data : {
+                                    roomid : roomInfo.roomid
+                                }
+                            })
+                            setBan(0)
+                        }}/>
+                    </div>
+                </div>
                 <input type='button' className='chessColor' style={color[1] === false ? black : white} 
-                    onClick={(event)=>{setColor([color[0], !color[1]])}} value={color[1] === false ? '흑' : '백'}
-                    disabled={roomInfo.player_second !== profile.id}/>
+                    value={color[1] === false ? '흑' : '백'}
+                    disabled={true}/>
                 <input className='chessReady' type='button' style={ready[1] === false ? black : white}
                     onClick={(event)=>{ 
-                        setReady([ready[0], !ready[1]]) 
+                        axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}ready`, {
+                            data : {
+                                who : 2,
+                                ready : ready[1] === true ? 0 : 1,
+                                roomid : roomInfo.roomid
+                            }
+                        })
                     }} value={ready[1] === false ? '준비' : '준비완료'}
                     disabled={roomInfo.player_second !== profile.id}/>
             </div>
@@ -267,7 +333,6 @@ export default function Room(){
                                 data : {
                                     id : profile.id,
                                     chatgroup : roomInfo.roomid,
-                                    nickname : profile.nickname,
                                     commend : event.target.value,
                                     time : time.getFullYear() + '/' + (time.getMonth() + 1) + "/" + time.getDay() + " " +
                                         time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds()

@@ -17,6 +17,10 @@
     text-align: right;
 }
 
+#lobbyHead > p{
+    cursor: pointer;
+}
+
 #profileBox{
     margin: 50px auto 20px;
     min-width: 280px;

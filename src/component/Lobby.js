@@ -12,7 +12,8 @@ export default function Lobby(){
     const [room, setRoom] = useState([]);
     const [chat, setChat] = useState([]);
     const [report, setReport] = useState(0);
-
+    const [board, setBoard] = useState([]);
+    // console.log('('+String([1,2,3,4])+')')
     const useInterval = (callback, delay) => {
         const savedCallback = useRef(); 
 
@@ -45,7 +46,7 @@ export default function Lobby(){
                                 let reportNum = event.target.parentNode.getAttribute('id');
                                 setReport(Number(reportNum))
                             }}>
-                                {res.data[i].nickname}
+                                {res.data[i].id}
                             </div>
                             <div className='chatCommend'>
                                 {res.data[i].commend}
@@ -68,19 +69,21 @@ export default function Lobby(){
         axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}roomlist`)
             .then((res) => {
                 let temp = [];
+                let nums = [];
                 for(let i = 0; i < res.data.length; i++){
                     if(res.data[i].player_first ==='none'){
                         continue
                     }
+                    nums.push(res.data[i].board_num)
                     temp.push(
                         <div key={`room${i}`} className='chessRoom'>
                             <div className='roomCheck'>
-                                <div style={{display : res.data[i].player_second === 'none' || res.data[i].player_first === profile.nickname ? 'none' : 'block'}} className='checkSign'></div>
+                                <div style={{display : res.data[i].player_second === 'none' && res.data[i].player_first !== profile.id? 'none' : 'block'}} className='checkSign'></div>
                             </div>
                             <div className='roomName'>
                                 {res.data[i].roomname}
                             </div>
-                            <div className='roomButton' onClick={res.data[i].player_second !== 'none' || res.data[i].player_first === profile.nickname ? ()=>{console.log('불가')} : () => {
+                            <div className='roomButton' onClick={res.data[i].player_second !== 'none' || res.data[i].player_first === profile.ud ? ()=>{console.log('불가')} : () => {
                                 axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}enterRoom`, {
                                     data : {
                                         roomid : res.data[i].roomid,
@@ -102,6 +105,7 @@ export default function Lobby(){
                     )
                 }
                 setRoom(temp);
+                setBoard(nums);
             })
     }, 1000)
 
@@ -116,11 +120,11 @@ export default function Lobby(){
 
 
     // {
-    //     "id": "manager",
-    //     "nickname": "manager",
-    //     "levels": 1,
-    //     "lose": 0,
-    //     "wins": 0
+    //     'id': 'manager',
+    //     'nickname': 'manager',
+    //     'levels': 1,
+    //     'lose': 0,
+    //     'wins': 0
     // }
 
     return <div id='lobbyBack'>
@@ -155,13 +159,20 @@ export default function Lobby(){
         </div>
         <div id='lobby'>
             <div id='lobbyHead'>
-                <Link to='/'>Logout</Link>
+                <p onClick={() => {
+                    axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}logout`, {
+                        data : {
+                            id : profile.id
+                        }
+                    })
+                    navigate('/')
+                }}>Logout</p>
             </div>
 
             <div id='profileBox'>
                 <div id='profileOver'>
                     <div id='profileDetail'>
-                        {profile.levels}Lv {profile.nickname}
+                        {profile.levels}Lv {profile.id}
                     </div>
                     <div id='profileRecord'>
                         <div id='levelsBar'>
@@ -170,7 +181,27 @@ export default function Lobby(){
                     </div>
                 </div>
                 <div id='profileUnder'>
-                    <input type='button' value='매칭' onClick={() => {}}/>
+                    <input type='button' value='매칭' onClick={() => {
+                        axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}match`)
+                            .then((res) => {
+                                if(res.data.length === 0){
+                                    return
+                                }
+                                axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}enterRoom`, {
+                                    data : {
+                                        roomid : res.data[0].roomid,
+                                        player_second : profile.id,
+                                        white : profile.id
+                                    }
+                                })
+                                navigate('/room', {
+                                    state : {
+                                        profile : profile,
+                                        roomInfo : res.data[0]
+                                    }
+                                });
+                            })
+                    }}/>
                     <input type='button' value='방만들기' onClick={(event) => {
                         if(event.target.parentNode.style.height === '200px'){
                             event.target.parentNode.style.height = '';
@@ -182,11 +213,14 @@ export default function Lobby(){
                         <input type='text' id='roomName' name='roomName' placeholder='방 이름'/>
                         <input type='button' value='생성' onClick={() => {
                             let roomName = document.getElementById('roomName').value;
+                            let date = new Date();
                             if(roomName === '') return
                             axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}createRoom`, {
                                 data : {
                                     id : profile.id,
-                                    roomName : roomName
+                                    roomName : roomName,
+                                    board : "{" + String(board) + "}" === "{}" ? '{0}' : "{" + String(board) + "}",
+                                    time : parseInt(date.getTime() / 1000)
                                 }
                             }).then((res) => {
                                 console.log(res.data)
@@ -232,10 +266,9 @@ export default function Lobby(){
                                 data : {
                                     id : profile.id,
                                     chatgroup : 0,
-                                    nickname : profile.nickname,
                                     commend : event.target.value,
-                                    time : time.getFullYear() + '/' + (time.getMonth() + 1) + "/" + time.getDay() + " " +
-                                        time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds()
+                                    time : time.getFullYear() + '/' + (time.getMonth() + 1) + '/' + time.getDay() + ' ' +
+                                        time.getHours() + ':' + time.getMinutes() + ':' + time.getSeconds()
                                 }
                             })
                             event.target.value = '';
