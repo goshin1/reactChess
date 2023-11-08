@@ -17,42 +17,27 @@ export default function PlayUp(){
     const [drag, setDrag] = useState(); // 드래그 이벤트 시 무슨 기물인지
     const [parent, setParent] = useState(); // 드래그 중인 기물의 본인 위치를 기록 
     const [click, setClick] = useState(); // 드래그 영역에 다른 기물을 두는 것을 방지하기 위한 
-    const [cObj, setCObj] = useState(0); // 클릭 이벤트 시 클릭 객체를 전달
     const [time, setTime] = useState(0); // 턴 시간 측정
-    const [ban, setBan] = useState(0); // 상대방의 탈주를 확인
-    const [result, setResult] = useState(0); // 승패를 확인
+    const [ban, setBan] = useState(roomInfo.player_first === profile.id ? roomInfo.ready_second : roomInfo.ready_first); // 상대방의 탈주를 확인
+    const [promotion, setPromotion] = useState('none');
+    const [selection, setSelection] = useState(0);
+    const [objCount, setObjCount] = useState([0,0,0,0]);
+    // 체스판 정보를 불러올 때 자신의 색상의 맞는 나이트,비숍,룩,퀸에 숫자를 세서 배열에 값을 저장한다.
+    // 그리고 나서 promotion을 진행할 때 objCount를 참고해서 이름을 정한다. 예를 들어 첫번쨰(나이트)가 2이면
+    // 더하기 1을 한 뒤 이름을 black_knight_3으로 만들어서 승급을 진행한다.
+
 
     const imgs_key = {
-        'black_phone_1' : 'black-phone.png',
-        'black_phone_2' : 'black-phone.png',
-        'black_phone_3' : 'black-phone.png',
-        'black_phone_4' : 'black-phone.png',
-        'black_phone_5' : 'black-phone.png',
-        'black_phone_6' : 'black-phone.png',
-        'black_phone_7' : 'black-phone.png',
-        'black_phone_8' : 'black-phone.png',
-        'black_knight_1' : 'black-knight.png',
-        'black_knight_2' : 'black-knight.png',
-        'black_bishop_1' : 'black-bishop.png',
-        'black_bishop_2' : 'black-bishop.png',
-        'black_look_1' : 'black-look.png',
-        'black_look_2' : 'black-look.png',
+        'black_phone' : 'black-phone.png',
+        'black_knight' : 'black-knight.png',
+        'black_bishop' : 'black-bishop.png',
+        'black_look' : 'black-look.png',
         'black_king' : 'black-king.png',
         'black_queen' : 'black-queen.png',
-        'white_phone_1' : 'white-phone.png',
-        'white_phone_2' : 'white-phone.png',
-        'white_phone_3' : 'white-phone.png',
-        'white_phone_4' : 'white-phone.png',
-        'white_phone_5' : 'white-phone.png',
-        'white_phone_6' : 'white-phone.png',
-        'white_phone_7' : 'white-phone.png',
-        'white_phone_8' : 'white-phone.png',
-        'white_knight_1' : 'white-knight.png',
-        'white_knight_2' : 'white-knight.png',
-        'white_bishop_1' : 'white-bishop.png',
-        'white_bishop_2' : 'white-bishop.png',
-        'white_look_1' : 'white-look.png',
-        'white_look_2' : 'white-look.png',
+        'white_phone' : 'white-phone.png',
+        'white_knight' : 'white-knight.png',
+        'white_bishop' : 'white-bishop.png',
+        'white_look' : 'white-look.png',
         'white_king' : 'white-king.png',
         'white_queen' : 'white-queen.png'
     }
@@ -71,31 +56,117 @@ export default function PlayUp(){
         'white_queen',
         'white_king'
     ];
-    
-    const exitMsg = {
-        1 : '패배하셨습니다',
-        2 : '승리하셨습니다'
+
+    const promotion_title = {
+        0 : roomInfo.black === profile.id ? 'black_knight' : 'white_knight',
+        1 : roomInfo.black === profile.id ? 'black_bishop' : 'white_bishop',
+        2 : roomInfo.black === profile.id ? 'black_look' : 'white_look',
+        3 : roomInfo.black === profile.id ? 'black_queen' : 'white_queen'
     }
+
 
     if(boardP !== undefined){   
         if(boardP.white_king === '0-0'){
-            if(roomInfo.white === profile.id){
-                setResult(1);
-            }else if(roomInfo.white !== profile.id){
-                setResult(2);
+            if(roomInfo.white === profile.id){   // 패배
+                if(roomInfo.player_first === profile.id){
+                    navigate('/exit', {
+                        state : {
+                            res : 1,
+                            profile : profile,
+                            roomInfo : roomInfo,
+                            who : 1,
+                            ban : false
+                        }
+                    })
+                }else{
+                    navigate('/exit', {
+                        state : {
+                            res : 1,
+                            profile : profile,
+                            roomInfo : roomInfo,
+                            who : 2,
+                            ban : false
+                        }
+                    })
+                }
+            }else if(roomInfo.white !== profile.id){ // 승리
+                if(roomInfo.player_first === profile.id){
+                    navigate('/exit', {
+                        state : {
+                            res : 2,
+                            profile : profile,
+                            roomInfo : roomInfo,
+                            who : 1,
+                            ban : false
+                        }
+                    })
+                }else{
+                    navigate('/exit', {
+                        state : {
+                            res : 2,
+                            profile : profile,
+                            roomInfo : roomInfo,
+                            who : 2,
+                            ban : false
+                        }
+                    })
+                }
             }
+            
         }else if(boardP.black_king === '0-0'){
-            if(roomInfo.white === profile.id){
-                setResult(2);
-            }else if(roomInfo.white !== profile.id){
-                setResult(1);
+            if(roomInfo.black === profile.id){   // 패배
+                if(roomInfo.player_first === profile.id){
+                    navigate('/exit', {
+                        state : {
+                            res : 1,
+                            profile : profile,
+                            roomInfo : roomInfo,
+                            who : 1,
+                            ban : false
+                        }
+                    })
+                }else{
+                    navigate('/exit', {
+                        state : {
+                            res : 1,
+                            profile : profile,
+                            roomInfo : roomInfo,
+                            who : 2,
+                            ban : false
+                        }
+                    })
+                }
+            }else if(roomInfo.black !== profile.id){ // 승리
+                if(roomInfo.player_first === profile.id){
+                    navigate('/exit', {
+                        state : {
+                            res : 2,
+                            profile : profile,
+                            roomInfo : roomInfo,
+                            who : 1,
+                            ban : false
+                        }
+                    })
+                }else{
+                    navigate('/exit', {
+                        state : {
+                            res : 2,
+                            profile : profile,
+                            roomInfo : roomInfo,
+                            who : 2,
+                            ban : false
+                        }
+                    })
+                }
             }
+            
         }
     }
     const wareCheck = () => {   // 말의 위치가 다른 경우(가끔 이동하고 나서 기존 위치의 남을 때)
         axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}test`, {
             data : {
-                board_num : roomInfo.board_num
+                board_num : roomInfo.board_num,
+                viewname : roomInfo.viewname
             }
         })
             .then((res) => {
@@ -103,7 +174,7 @@ export default function PlayUp(){
                 setBoardP(wares);
                 let wares_keys = Object.keys(wares)
                 for(let i = 0; i < wares_keys.length; i++){
-                    if(wares_keys[i] === 'board_num')
+                    if(wares_keys[i] === 'board_num' || document.getElementById(wares_keys[i]) === null)
                         continue
                     if(document.getElementById(wares_keys[i]).parentNode.getAttribute('id').replace('chessCol', '') !== wares[wares_keys[i]]){
                         document.getElementById(wares_keys[i]).parentNode.textContent = '';
@@ -112,6 +183,10 @@ export default function PlayUp(){
                 }
             })
     }
+    // if(boardP !== undefined){
+    //     console.log(Object.keys(boardP))
+    // }
+    
 
     const chessClear = () => {  // 드래그 범위 변경 시 체스판 색상 초기화
 
@@ -135,10 +210,35 @@ export default function PlayUp(){
         }
     }
 
+    const promotionCheck = () => {  // 폰의 승급 시 원하는 기물이 현재 몇개인지 알아본 뒤 그에 맞는 컬럼명을 제작해서 넘기기
+        if(boardP === undefined) return 'fail';
+        const pName = {
+            0 : 'knight_',
+            1 : 'bishop_',
+            2 : 'look_',
+            3 : 'queen_'
+        }
+        let name = roomInfo.black === profile.id ? 'black_' + pName[selection] : 'white_' + pName[selection];
+        let start = roomInfo.black === profile.id ? 1 : 17;
+        let end = roomInfo.black === profile.id ? 17 : 33;
+        let cnt = 0;
+        let names = Object.keys(boardP)
+        for(let i = start; i < end; i++){
+            if(names[i].includes(name)){
+                cnt += 1
+            }
+        }
+        cnt += 1
+        return name + String(cnt)
+
+    };
+
+
     useEffect(()=>{
         axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}test`, {
             data : {
-                board_num : roomInfo.board_num
+                board_num : roomInfo.board_num,
+                viewname : roomInfo.viewname
             }
         })
         .then((res) => {
@@ -162,20 +262,20 @@ export default function PlayUp(){
                                     let start = parent.getAttribute('id').replace('chessCol', '') // 원래 있던 장소
                                     let end = event.currentTarget.getAttribute('id').replace('chessCol', '') // 이동하려는 장소
                                     const moveTime = parseInt(new Date().getTime() / 1000);
+                                    console.log(event.currentTarget.children)
                                     if(event.currentTarget.children[0] !== undefined){
-                                        // console.log("두는 곳에 있는 기물 : " + event.currentTarget.children[0].getAttribute('id'));
-                                        // console.log("두려는 기물 " + drag.getAttribute('id'))
-
+                                        
                                         const defender = event.currentTarget.children[0].getAttribute('id');
                                         const attacker = drag.getAttribute('id');
-                                        if(drag.getAttribute('id').includes('black') && event.currentTarget.children[0].getAttribute('id').includes('white')){
+                                        if((drag.getAttribute('id').includes('black') && event.currentTarget.children[0].getAttribute('id').includes('white')) ||
+                                            (drag.getAttribute('id').includes('white') && event.currentTarget.children[0].getAttribute('id').includes('black'))){
                                             axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}attack`, {
                                                 data : {
                                                     attackerP : end,
                                                     defenderP : '0-0',
                                                     attacker : attacker,
                                                     defender : defender,
-                                                    board_num : roomInfo.board_num,
+                                                    viewname : roomInfo.viewname,
                                                     first_time : moveTime,
                                                     second_time : moveTime
                                                 }
@@ -188,7 +288,7 @@ export default function PlayUp(){
                                             target : drag.getAttribute('id'),
                                             start  : start,
                                             end : end,
-                                            board_num : roomInfo.board_num,
+                                            viewname : roomInfo.viewname,
                                             first_time : moveTime,
                                             second_time : moveTime
                                         }
@@ -209,26 +309,27 @@ export default function PlayUp(){
                                     setTime(0)
                                 }
                             }} onDoubleClick={(event) => {
-                                console.log(click)
+                                
                                 if(event.currentTarget.style.backgroundColor === 'red'){
-                                    let parent = click.parentNode;
-                                    let start = parent.getAttribute('id').replace('chessCol', '') // 원래 있던 장소
+                                    let parentClick = click.parentNode;
+                                    console.log(parentClick)
+                                    let start = parentClick.getAttribute('id').replace('chessCol', '') // 원래 있던 장소
                                     let end = event.currentTarget.getAttribute('id').replace('chessCol', '') // 이동하려는 장소
                                     const moveTime = parseInt(new Date().getTime() / 1000);
+                                    console.log(event.currentTarget.children)
                                     if(event.currentTarget.children[0] !== undefined){
-                                        // console.log("두는 곳에 있는 기물 : " + event.currentTarget.children[0].getAttribute('id'));
-                                        // console.log("두려는 기물 " + drag.getAttribute('id'))
-
+                                        
                                         const defender = event.currentTarget.children[0].getAttribute('id');
                                         const attacker = click.getAttribute('id');
-                                        if(click.getAttribute('id').includes('black') && event.currentTarget.children[0].getAttribute('id').includes('white')){
+                                        if((click.getAttribute('id').includes('black') && event.currentTarget.children[0].getAttribute('id').includes('white')) ||
+                                            (click.getAttribute('id').includes('white') && event.currentTarget.children[0].getAttribute('id').includes('black'))){
                                             axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}attack`, {
                                                 data : {
                                                     attackerP : end,
                                                     defenderP : '0-0',
                                                     attacker : attacker,
                                                     defender : defender,
-                                                    board_num : roomInfo.board_num,
+                                                    viewname : roomInfo.viewname,
                                                     first_time : moveTime,
                                                     second_time : moveTime
                                                 }
@@ -241,7 +342,7 @@ export default function PlayUp(){
                                             target : click.getAttribute('id'),
                                             start  : start,
                                             end : end,
-                                            board_num : roomInfo.board_num,
+                                            viewname : roomInfo.viewname,
                                             first_time : moveTime,
                                             second_time : moveTime
                                         }
@@ -272,20 +373,21 @@ export default function PlayUp(){
                                     let start = parent.getAttribute('id').replace('chessCol', '') // 원래 있던 장소
                                     let end = event.currentTarget.getAttribute('id').replace('chessCol', '') // 이동하려는 장소
                                     const moveTime = parseInt(new Date().getTime() / 1000);
+                                    console.log(event.currentTarget.children)
                                     if(event.currentTarget.children[0] !== undefined){
-                                        // console.log("두는 곳에 있는 기물 : " + event.currentTarget.children[0].getAttribute('id'));
-                                        // console.log("두려는 기물 " + drag.getAttribute('id'))
-
+                                        
                                         const defender = event.currentTarget.children[0].getAttribute('id');
                                         const attacker = drag.getAttribute('id');
-                                        if(drag.getAttribute('id').includes('black') && event.currentTarget.children[0].getAttribute('id').includes('white')){
+                                        
+                                        if((drag.getAttribute('id').includes('black') && event.currentTarget.children[0].getAttribute('id').includes('white')) ||
+                                            (drag.getAttribute('id').includes('white') && event.currentTarget.children[0].getAttribute('id').includes('black'))){
                                             axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}attack`, {
                                                 data : {
                                                     attackerP : end,
                                                     defenderP : '0-0',
                                                     attacker : attacker,
                                                     defender : defender,
-                                                    board_num : roomInfo.board_num,
+                                                    viewname : roomInfo.viewname,
                                                     first_time : moveTime,
                                                     second_time : moveTime
                                                 }
@@ -298,7 +400,7 @@ export default function PlayUp(){
                                             target : drag.getAttribute('id'),
                                             start  : start,
                                             end : end,
-                                            board_num : roomInfo.board_num,
+                                            viewname : roomInfo.viewname,
                                             first_time : moveTime,
                                             second_time : moveTime
                                         }
@@ -320,26 +422,27 @@ export default function PlayUp(){
                                 }
                                 
                             }} onDoubleClick={(event) => {
-                                console.log(click)
+                                
                                 if(event.currentTarget.style.backgroundColor === 'red'){
-                                    let parent = click.parentNode;
-                                        let start = parent.getAttribute('id').replace('chessCol', '') // 원래 있던 장소
+                                        let parentClick = click.parentNode;
+                                        console.log(parentClick)
+                                        let start = parentClick.getAttribute('id').replace('chessCol', '') // 원래 있던 장소
                                         let end = event.currentTarget.getAttribute('id').replace('chessCol', '') // 이동하려는 장소
                                         const moveTime = parseInt(new Date().getTime() / 1000);
+                                        console.log(event.currentTarget.children)
+                                        
                                         if(event.currentTarget.children[0] !== undefined){
-                                            // console.log("두는 곳에 있는 기물 : " + event.currentTarget.children[0].getAttribute('id'));
-                                            // console.log("두려는 기물 " + drag.getAttribute('id'))
-    
                                             const defender = event.currentTarget.children[0].getAttribute('id');
                                             const attacker = click.getAttribute('id');
-                                            if(click.getAttribute('id').includes('black') && event.currentTarget.children[0].getAttribute('id').includes('white')){
+                                            if((click.getAttribute('id').includes('black') && event.currentTarget.children[0].getAttribute('id').includes('white')) ||
+                                                (click.getAttribute('id').includes('white') && event.currentTarget.children[0].getAttribute('id').includes('black'))){
                                                 axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}attack`, {
                                                     data : {
                                                         attackerP : end,
                                                         defenderP : '0-0',
                                                         attacker : attacker,
                                                         defender : defender,
-                                                        board_num : roomInfo.board_num,
+                                                        viewname : roomInfo.viewname,
                                                         first_time : moveTime,
                                                         second_time : moveTime
                                                     }
@@ -352,7 +455,7 @@ export default function PlayUp(){
                                                 target : click.getAttribute('id'),
                                                 start  : start,
                                                 end : end,
-                                                board_num : roomInfo.board_num,
+                                                viewname : roomInfo.viewname,
                                                 first_time : moveTime,
                                                 second_time : moveTime
                                             }
@@ -388,31 +491,32 @@ export default function PlayUp(){
                                         let start = parent.getAttribute('id').replace('chessCol', '') // 원래 있던 장소
                                         let end = event.currentTarget.getAttribute('id').replace('chessCol', '') // 이동하려는 장소
                                         const moveTime = parseInt(new Date().getTime() / 1000);
+                                        console.log(event.currentTarget.children)
                                         if(event.currentTarget.children[0] !== undefined){
-
-                                        const defender = event.currentTarget.children[0].getAttribute('id');
-                                        const attacker = drag.getAttribute('id');
-                                        
-                                        if(drag.getAttribute('id').includes('black') && event.currentTarget.children[0].getAttribute('id').includes('white')){
-                                            axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}attack`, {
-                                                data : {
-                                                    attackerP : end,
-                                                    defenderP : '0-0',
-                                                    attacker : attacker,
-                                                    defender : defender,
-                                                    board_num : roomInfo.board_num,
-                                                    first_time : moveTime,
-                                                    second_time : moveTime
-                                                }
-                                            })
-                                        }
+                                            const defender = event.currentTarget.children[0].getAttribute('id');
+                                            const attacker = drag.getAttribute('id');
+                                            
+                                            if((drag.getAttribute('id').includes('black') && event.currentTarget.children[0].getAttribute('id').includes('white')) || 
+                                                (drag.getAttribute('id').includes('white') && event.currentTarget.children[0].getAttribute('id').includes('black'))){
+                                                axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}attack`, {
+                                                    data : {
+                                                        attackerP : end,
+                                                        defenderP : '0-0',
+                                                        attacker : attacker,
+                                                        defender : defender,
+                                                        viewname : roomInfo.viewname,
+                                                        first_time : moveTime,
+                                                        second_time : moveTime
+                                                    }
+                                                })
+                                            }
                                     }
                                         axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}moveTest`, {
                                             data : {
                                                 target : drag.getAttribute('id'),
                                                 start  : start,
                                                 end : end,
-                                                board_num : roomInfo.board_num,
+                                                viewname : roomInfo.viewname,
                                                 first_time : moveTime,
                                                 second_time : moveTime
                                             }
@@ -433,26 +537,26 @@ export default function PlayUp(){
                                         setTime(0)
                                     }
                                 }} onDoubleClick={(event) => {
-                                    console.log(click)
+                                    
                                     if(event.currentTarget.style.backgroundColor === 'red'){
-                                        let parent = click.parentNode;
-                                        let start = parent.getAttribute('id').replace('chessCol', '') // 원래 있던 장소
+                                        let parentClick = click.parentNode;
+                                        console.log(parentClick)
+                                        let start = parentClick.getAttribute('id').replace('chessCol', '') // 원래 있던 장소
                                         let end = event.currentTarget.getAttribute('id').replace('chessCol', '') // 이동하려는 장소
                                         const moveTime = parseInt(new Date().getTime() / 1000);
+                                        console.log(event.currentTarget.children)
                                         if(event.currentTarget.children[0] !== undefined){
-                                            // console.log("두는 곳에 있는 기물 : " + event.currentTarget.children[0].getAttribute('id'));
-                                            // console.log("두려는 기물 " + drag.getAttribute('id'))
-    
                                             const defender = event.currentTarget.children[0].getAttribute('id');
                                             const attacker = click.getAttribute('id');
-                                            if(click.getAttribute('id').includes('black') && event.currentTarget.children[0].getAttribute('id').includes('white')){
+                                            if((click.getAttribute('id').includes('black') && event.currentTarget.children[0].getAttribute('id').includes('white')) ||
+                                                (click.getAttribute('id').includes('white') && event.currentTarget.children[0].getAttribute('id').includes('black'))){
                                                 axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}attack`, {
                                                     data : {
                                                         attackerP : end,
                                                         defenderP : '0-0',
                                                         attacker : attacker,
                                                         defender : defender,
-                                                        board_num : roomInfo.board_num,
+                                                        viewname : roomInfo.viewname,
                                                         first_time : moveTime,
                                                         second_time : moveTime
                                                     }
@@ -465,7 +569,7 @@ export default function PlayUp(){
                                                 target : click.getAttribute('id'),
                                                 start  : start,
                                                 end : end,
-                                                board_num : roomInfo.board_num,
+                                                viewname : roomInfo.viewname,
                                                 first_time : moveTime,
                                                 second_time : moveTime
                                             }
@@ -496,19 +600,20 @@ export default function PlayUp(){
                                     let start = parent.getAttribute('id').replace('chessCol', '') // 원래 있던 장소
                                     let end = event.currentTarget.getAttribute('id').replace('chessCol', '') // 이동하려는 장소]]
                                     const moveTime = parseInt(new Date().getTime() / 1000);
+                                    console.log(event.currentTarget.children)
                                     if(event.currentTarget.children[0] !== undefined){
-
                                         const defender = event.currentTarget.children[0].getAttribute('id');
                                         const attacker = drag.getAttribute('id');
                                         
-                                        if(drag.getAttribute('id').includes('black') && event.currentTarget.children[0].getAttribute('id').includes('white')){
+                                        if((drag.getAttribute('id').includes('black') && event.currentTarget.children[0].getAttribute('id').includes('white')) ||
+                                            (drag.getAttribute('id').includes('white') && event.currentTarget.children[0].getAttribute('id').includes('black'))){
                                             axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}attack`, {
                                                 data : {
                                                     attackerP : end,
                                                     defenderP : '0-0',
                                                     attacker : attacker,
                                                     defender : defender,
-                                                    board_num : roomInfo.board_num,
+                                                    viewname : roomInfo.viewname,
                                                     first_time : moveTime,
                                                     second_time : moveTime
                                                 }
@@ -520,7 +625,7 @@ export default function PlayUp(){
                                             target : drag.getAttribute('id'),
                                             start  : start,
                                             end : end,
-                                            board_num : roomInfo.board_num,
+                                            viewname : roomInfo.viewname,
                                             first_time : moveTime,
                                             second_time : moveTime
                                         }
@@ -542,26 +647,27 @@ export default function PlayUp(){
                                     setTime(0)
                                 }
                             }} onDoubleClick={(event) => {
-                                console.log(click)
+                                
                                 if(event.currentTarget.style.backgroundColor === 'red'){
-                                    let parent = click.parentNode;
-                                        let start = parent.getAttribute('id').replace('chessCol', '') // 원래 있던 장소
+                                        let parentClick = click.parentNode;
+                                        console.log(parentClick)
+                                        let start = parentClick.getAttribute('id').replace('chessCol', '') // 원래 있던 장소
                                         let end = event.currentTarget.getAttribute('id').replace('chessCol', '') // 이동하려는 장소
                                         const moveTime = parseInt(new Date().getTime() / 1000);
+                                        console.log(event.currentTarget.children)
                                         if(event.currentTarget.children[0] !== undefined){
-                                            // console.log("두는 곳에 있는 기물 : " + event.currentTarget.children[0].getAttribute('id'));
-                                            // console.log("두려는 기물 " + drag.getAttribute('id'))
-    
+                                            
                                             const defender = event.currentTarget.children[0].getAttribute('id');
                                             const attacker = click.getAttribute('id');
-                                            if(click.getAttribute('id').includes('black') && event.currentTarget.children[0].getAttribute('id').includes('white')){
+                                            if((click.getAttribute('id').includes('black') && event.currentTarget.children[0].getAttribute('id').includes('white')) ||
+                                                (click.getAttribute('id').includes('white') && event.currentTarget.children[0].getAttribute('id').includes('black'))){
                                                 axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}attack`, {
                                                     data : {
                                                         attackerP : end,
                                                         defenderP : '0-0',
                                                         attacker : attacker,
                                                         defender : defender,
-                                                        board_num : roomInfo.board_num,
+                                                        viewname : roomInfo.viewname,
                                                         first_time : moveTime,
                                                         second_time : moveTime
                                                     }
@@ -574,7 +680,7 @@ export default function PlayUp(){
                                                 target : click.getAttribute('id'),
                                                 start  : start,
                                                 end : end,
-                                                board_num : roomInfo.board_num,
+                                                viewname : roomInfo.viewname,
                                                 first_time : moveTime,
                                                 second_time : moveTime
                                             }
@@ -619,6 +725,90 @@ export default function PlayUp(){
                     continue
                 const p = boardP[keys[i]].split('-');
                 const parent = document.getElementById(`chessCol${p[0]}-${p[1]}`);
+                try{
+                    if(parent.childElementCount === 0){
+                        const obj = document.createElement('div');
+                        obj.setAttribute('class', 'chessMen content')
+                        obj.setAttribute('id', keys[i]);
+                        obj.setAttribute('draggable', true);
+                        obj.setAttribute('key', keys[i])
+                        for(let j = 0; j < title.length; j++){
+                            if(keys[i].includes(title[j])){
+
+                                
+
+                                obj.addEventListener('click', (event) => {
+                                    const position = parent.getAttribute('id').replace('chessCol','').split('-');
+                                    console.log(event.target.id.includes('black_phone') && position[0] === '8' && roomInfo.black === profile.id)
+                                    console.log(event.target.id.includes('white_phone') && position[0] === '1' && roomInfo.white === profile.id)
+                                    if(event.target.id.includes('black_phone') && position[0] === '8' && roomInfo.black === profile.id){
+                                        setPromotion('black')
+                                        setClick(obj);
+                                        return
+                                    }
+                                    if(event.target.id.includes('white_phone') && position[0] === '1' && roomInfo.white === profile.id){
+                                        setPromotion('white')
+                                        setClick(obj);
+                                        return
+                                    }
+                                    axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}updateGame`, {
+                                        data : {
+                                            roomid : roomInfo.roomid
+                                        }
+                                    }).then((res) => {
+                                        if(res.data.turn !== profile.id){
+                                            return
+                                        }
+                                        if((event.target.id.includes('white') && res.data.white === profile.id) ||
+                                            (event.target.id.includes('black') && res.data.black === profile.id)){
+                                                move_chess[title[j]](parent, obj, setClick)
+                                                
+                                        }
+                                    })
+                                    // if(roomInfo.turn !== profile.id){
+                                    //     return
+                                    // }
+                                    // if((event.target.id.includes('white') && roomInfo.white === profile.id) ||
+                                    //     (event.target.id.includes('black') && roomInfo.black === profile.id)){
+                                    //         move_chess[title[j]](parent, obj, setClick)
+                                            
+                                    // }
+                                    
+                                    return
+                                })
+                                break
+                            }
+                        }
+                        let name = keys[i].split('_');
+                        obj.style.backgroundImage = `url(../imgs/${imgs_key[name[0] + "_" + name[1]]})`;
+                        document.getElementById(`chessCol${p[0]}-${p[1]}`).appendChild(obj)
+                    }
+                }catch(err){
+                    navigate('/play', {
+                        state : {
+                            profile : profile,
+                            roomInfo : roomInfo
+                        }
+                    })
+                }
+                
+            }
+        }
+        setChessBoard(initBoard);
+
+    },[, time])
+
+    if(boardP !== undefined){
+        let temp = []
+        const keys = Object.keys(boardP)
+        for(let i = 0; i < keys.length; i++){
+            if(keys[i] === 'board_num')
+                continue
+            if(boardP[keys[i]] === '0-0')
+                continue
+            const p = boardP[keys[i]].split('-');
+            const parent = document.getElementById(`chessCol${p[0]}-${p[1]}`);
+            try{
                 if(parent.childElementCount === 0){
                     const obj = document.createElement('div');
                     obj.setAttribute('class', 'chessMen content')
@@ -628,6 +818,18 @@ export default function PlayUp(){
                     for(let j = 0; j < title.length; j++){
                         if(keys[i].includes(title[j])){
                             obj.addEventListener('click', (event) => {
+                                const position = parent.getAttribute('id').replace('chessCol','').split('-');
+                                if(event.target.id.includes('black_phone') && position[0] === '8' && roomInfo.black === profile.id){
+                                    setPromotion('black')
+                                    setClick(obj);
+                                    return;
+                                }
+                                if(event.target.id.includes('white_phone') && position[0] === '1' && roomInfo.white === profile.id){
+                                    setPromotion('white')
+                                    setClick(obj);
+                                    return;
+                                }
+                                
                                 axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}updateGame`, {
                                     data : {
                                         roomid : roomInfo.roomid
@@ -650,78 +852,37 @@ export default function PlayUp(){
                                 //         move_chess[title[j]](parent, obj, setClick)
                                         
                                 // }
-                                console.log(click)
+                                
                                 return
                             })
                             break
                         }
                     }
-                    obj.style.backgroundImage = `url(../imgs/${imgs_key[keys[i]]})`;
+                    let name = keys[i].split('_');
+                    obj.style.backgroundImage = `url(../imgs/${imgs_key[name[0]+'_'+name[1]]})`;
                     document.getElementById(`chessCol${p[0]}-${p[1]}`).appendChild(obj)
                 }
-            }
-        }
-        setChessBoard(initBoard);
-
-    },[, roomInfo])
-
-    if(boardP !== undefined){
-        let temp = []
-        const keys = Object.keys(boardP)
-        for(let i = 0; i < keys.length; i++){
-            if(keys[i] === 'board_num')
-                continue
-            if(boardP[keys[i]] === '0-0')
-                continue
-            const p = boardP[keys[i]].split('-');
-            const parent = document.getElementById(`chessCol${p[0]}-${p[1]}`);
-            if(parent.childElementCount === 0){
-                const obj = document.createElement('div');
-                obj.setAttribute('class', 'chessMen content')
-                obj.setAttribute('id', keys[i]);
-                obj.setAttribute('draggable', true);
-                obj.setAttribute('key', keys[i])
-                for(let j = 0; j < title.length; j++){
-                    if(keys[i].includes(title[j])){
-                        obj.addEventListener('click', (event) => {
-                        
-                            axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}updateGame`, {
-                                data : {
-                                    roomid : roomInfo.roomid
+                for(let z = 0; z < title.length; z++){
+                    for(let i = 1; i <= 8; i++){
+                        for(let j = 1; j < 8; j++){
+                            let name = `chessCol${i}-${j}`;
+                            let target = document.getElementById(name);
+                            if(target.childNodes.length > 0){
+                                if(boardP[target.firstChild.getAttribute('id')] !== `${i}-${j}`){
+                                    document.getElementById(name).textContent = '';
+                                    break
                                 }
-                            }).then((res) => {
-                                if(res.data.turn !== profile.id){
-                                    return
-                                }
-                                if((event.target.id.includes('white') && res.data.white === profile.id) ||
-                                    (event.target.id.includes('black') && res.data.black === profile.id)){
-                                        move_chess[title[j]](parent, obj, setClick)
-                                        
-                                }
-                            })
-                            
-                            return
-                        })
-                        break
-                    }
-                }
-                obj.style.backgroundImage = `url(../imgs/${imgs_key[keys[i]]})`;
-                document.getElementById(`chessCol${p[0]}-${p[1]}`).appendChild(obj)
-            }
-        }
-
-        for(let z = 0; z < title.length; z++){
-            for(let i = 1; i <= 8; i++){
-                for(let j = 1; j < 8; j++){
-                    let name = `chessCol${i}-${j}`;
-                    let target = document.getElementById(name);
-                    if(target.childNodes.length > 0){
-                        if(boardP[target.firstChild.getAttribute('id')] !== `${i}-${j}`){
-                            document.getElementById(name).textContent = '';
-                            break
+                            }
                         }
                     }
                 }
+            }catch(err){
+                navigate('/play', {
+                    state : {
+                        profile : profile,
+                        roomInfo : roomInfo
+                    }
+                })
             }
         }
     }
@@ -796,18 +957,18 @@ export default function PlayUp(){
     }
 
     useInterval(()=>{
+        
         axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}updateGame`, {
             data : {
                 roomid : roomInfo.roomid
             }
         }).then((res) => {
             setRoomInfo(res.data);
+            setBan(roomInfo.player_first === profile.id ? roomInfo.ready_second : roomInfo.ready_first);
         })
         let waitTime = new Date().getTime() / 1000;
         setTime(roomInfo.turn === roomInfo.player_first ? parseInt(waitTime) - parseInt(roomInfo.first_time) : parseInt(waitTime) - parseInt(roomInfo.second_time))
-        // console.log(roomInfo.turn === roomInfo.player_first ? parseInt(waitTime) - parseInt(roomInfo.first_time) : parseInt(waitTime) - parseInt(roomInfo.second_time))
-        // console.log(roomInfo.first_time + " : " + parseInt(waitTime))
-    }, result === 0 ? 1000 : 10**6)
+    }, 1000)
 
     
     
@@ -837,9 +998,10 @@ export default function PlayUp(){
         setTime(0);
     }
 
-    if(time > 60 && roomInfo.turn !== profile.id){
-        if(time / 60 > ban){
-            setBan(ban + 1);
+
+
+    if(time > 80 && roomInfo.turn !== profile.id){
+        if(time / 80 > ban){
             if(roomInfo.player_first === profile.id){
                 axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}banCheck`, {
                     data : {
@@ -847,6 +1009,8 @@ export default function PlayUp(){
                         ready : roomInfo.ready_second + 1, 
                         roomid : roomInfo.roomid
                     }
+                }).then((res) => {
+                    setBan(parseInt(res.data))
                 })
             }else if(roomInfo.player_second === profile.id){
                 axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}banCheck`, {
@@ -855,81 +1019,86 @@ export default function PlayUp(){
                         ready : roomInfo.ready_first + 1,
                         roomid : roomInfo.roomid
                     }
+                }).then((res) => {
+                    setBan(parseInt(res.data))
                 })
             }
-            if(ban >= 5){
-                if(roomInfo.player_first === profile.id){
-                    axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}gameSet`, {
-                        data : {
-                            who : 1,
-                            player_first : roomInfo.player_first,
-                            player_second : roomInfo.player_second
-                        }
-                    })
-                    setResult(1)
-                }else if(roomInfo.player_first === profile.id){
-                    axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}gameSet`, {
-                        data : {
-                            who : 1,
-                            player_first : roomInfo.player_first,
-                            player_second : roomInfo.player_second
-                        }
-                    })
-                    setResult(1)
+        }
+    }
+    if(ban >= 5){
+        if(roomInfo.player_first === profile.id){
+            navigate('/exit', {
+                state : {
+                    res : 2,
+                    profile : profile,
+                    roomInfo : roomInfo,
+                    who : 1,
+                    ban : true
                 }
-            }
+            })
+        }else if(roomInfo.player_second === profile.id){
+            navigate('/exit', {
+                state : {
+                    res : 2,
+                    profile : profile,
+                    roomInfo : roomInfo,
+                    who : 1,
+                    ban : true
+                }
+            })
         }
     }
 
     return <div id='play'>
-        <div id='exitBack' style={{display : result === 0 ? 'none' : 'black'}}>
-            <div id='resPopup'>
-                <p>{exitMsg[result]}</p>
-                <input type='button' value='나가기' onClick={() => {
-                    if(result === 1){   // 패배
-                        if(roomInfo.player_first === profile.id){
-                            axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}gameSet`, {
-                                data : {
-                                    who : 2,
-                                    player_first : roomInfo.player_first,
-                                    player_second : roomInfo.player_second
-                                }
-                            })
-                        }else{
-                            axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}gameSet`, {
-                                data : {
-                                    who : 1,
-                                    player_first : roomInfo.player_first,
-                                    player_second : roomInfo.player_second
-                                }
-                            })
-                        }
-                    }else if(result === 2){ // 승리
-                        if(roomInfo.player_first === profile.id){
-                            axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}gameSet`, {
-                                data : {
-                                    who : 1,
-                                    player_first : roomInfo.player_first,
-                                    player_second : roomInfo.player_second
-                                }
-                            })
-                        }else{
-                            axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}gameSet`, {
-                                data : {
-                                    who : 2,
-                                    player_first : roomInfo.player_first,
-                                    player_second : roomInfo.player_second
-                                }
-                            })
-                        }
-                    }
-                    navigate('/lobby', {
-                        state : {
-                            profile : profile
-                        }
-                    })
-                }}/>
+        <div id='promotion' style={{display : roomInfo.turn === profile.id && promotion !== 'none' ? 'block' : 'none' }}>
+            <div id='promotionList'>
+                <div className='promotionSel'
+                    style={{backgroundImage : roomInfo.black === profile.id ? 'url(../imgs/black-knight.png)' : 'url(../imgs/white-knight.png)',
+                            backgroundColor : selection === 0 ? 'rgb(246, 238, 227)' : 'rgba(0, 0, 0, 0)'}}
+                    onClick={() => setSelection(0)}></div>
+                <div className='promotionSel' 
+                    style={{backgroundImage : roomInfo.black === profile.id ? 'url(../imgs/black-bishop.png)' : 'url(../imgs/white-bishop.png)',
+                    backgroundColor : selection === 1 ? 'rgb(246, 238, 227)' : 'rgba(0, 0, 0, 0)'}}
+                    onClick={() => setSelection(1)}></div>
+                <div className='promotionSel' 
+                    style={{backgroundImage : roomInfo.black === profile.id ? 'url(../imgs/black-look.png)' : 'url(../imgs/white-look.png)',
+                    backgroundColor : selection === 2 ? 'rgb(246, 238, 227)' : 'rgba(0, 0, 0, 0)'}}
+                    onClick={() => setSelection(2)}></div>
+                <div className='promotionSel' 
+                    style={{backgroundImage : roomInfo.black === profile.id ? 'url(../imgs/black-queen.png)' : 'url(../imgs/white-queen.png)',
+                    backgroundColor : selection === 3 ? 'rgb(246, 238, 227)' : 'rgba(0, 0, 0, 0)'}}
+                    onClick={() => setSelection(3)}></div>
             </div>
+            <input type='button' value='change' onClick={() => {
+                console.log(click.getAttribute('id'))
+                let pName = promotionCheck();
+                console.log("promotion : " + pName)
+                axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}promotion`, {
+                    data : {
+                        viewname : roomInfo.viewname,
+                        selection : pName,
+                        target : click.getAttribute('id')
+                    }
+                })
+                setTimeout(() => {}, 100);
+                const moveTime = parseInt(new Date().getTime() / 1000);
+                wareCheck();
+                setDrag(undefined)
+                setParent(undefined)
+                chessClear()
+                axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}turnChange`, {
+                    data : {
+                        turn : roomInfo.turn === roomInfo.black ? roomInfo.white : roomInfo.black,
+                        roomid : roomInfo.roomid,
+                        first_time : moveTime,
+                        second_time : moveTime
+                    }
+                })
+                setTime(0)
+                setPromotion('none')
+                setClick(undefined)
+            }}/>
+            <input type='button' value='cancel' onClick={() => {setPromotion('none')}}/>
         </div>
         <div id='timeBox'> 
             {roomInfo.turn === profile.id ? time : '상대방의 턴입니다'}
@@ -937,8 +1106,24 @@ export default function PlayUp(){
         <div id='chessBoard'>
             {chessBoard}
         </div>
-        <input type='button' id='stopBtn' value='Stop' onClick={()=>{
+        <input type='button' id='stopBtn' value='기권' onClick={()=>{
+            axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}surrender`, {
+                data : {
+                    color : roomInfo.black === profile.id ? 'black' : 'white',
+                    board_num : roomInfo.board_num
+                }
+            }) // 기권 처리를 상대방에게 알리기 위해 본인의 킹을 0-0으로 수정
             
+            navigate('/exit', {
+                state : {
+                    res : 1,
+                    profile : profile,
+                    roomInfo : roomInfo,
+                    who : roomInfo.player_first === profile.id ? 1 : 2,
+                    ban : false
+                }
+            })
         }}/>
+        
     </div>
 }

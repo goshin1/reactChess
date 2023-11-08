@@ -49,15 +49,19 @@ export default function Login(){
                         pwd : pwd
                     }
                 }).then((res) => {
-                    if(res.data !== 'fail'){
+                    const loginInfo = res.data;
+
+                    if(loginInfo.login){
                         navigate('/lobby', {
                             state : {
-                                profile : res.data
+                                profile : loginInfo.info
                             }
                         })
                         return
                     }
-                    setPopup(3)
+                    axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}loginenforce`, {
+                        
+                    })
                     return
                 })
             }}/>

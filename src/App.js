@@ -6,7 +6,8 @@ import Lobby from './component/Lobby';
 import Login from './component/Login';
 import Sign from './component/Sign';
 import Room from './component/Room';
-
+import Exit from './component/Exit';
+import Update from './component/Update';
 
 
 function App() {
@@ -20,6 +21,8 @@ function App() {
           <Route path='/room' exact element={<Room></Room>}></Route>
           <Route path='/play' exact element={<PlayUp></PlayUp>}></Route>
           <Route path='/before' exact element={<Play></Play>}></Route>
+          <Route path='/exit' exact element={<Exit></Exit>}></Route>
+          <Route path='/update' exact element={<Update></Update>}></Route>
         </Routes>
       </BrowserRouter>
     </div>

@@ -71,22 +71,23 @@ export default function Lobby(){
                 let temp = [];
                 let nums = [];
                 for(let i = 0; i < res.data.length; i++){
-                    if(res.data[i].player_first ==='none'){
+                    const roomInfo = res.data[i];
+                    if(roomInfo.player_first ==='none'){
                         continue
                     }
-                    nums.push(res.data[i].board_num)
+                    nums.push(roomInfo.board_num)
                     temp.push(
                         <div key={`room${i}`} className='chessRoom'>
                             <div className='roomCheck'>
-                                <div style={{display : res.data[i].player_second === 'none' && res.data[i].player_first !== profile.id? 'none' : 'block'}} className='checkSign'></div>
+                                <div style={{display : roomInfo.player_second === 'none' && roomInfo.player_first !== profile.id? 'none' : 'block'}} className='checkSign'></div>
                             </div>
                             <div className='roomName'>
-                                {res.data[i].roomname}
+                                {roomInfo.roomname}
                             </div>
-                            <div className='roomButton' onClick={res.data[i].player_second !== 'none' || res.data[i].player_first === profile.ud ? ()=>{console.log('불가')} : () => {
+                            <div className='roomButton' onClick={roomInfo.player_second !== 'none' || roomInfo.player_first === profile.ud ? ()=>{console.log('불가')} : () => {
                                 axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}enterRoom`, {
                                     data : {
-                                        roomid : res.data[i].roomid,
+                                        roomid : roomInfo.roomid,
                                         player_second : profile.id,
                                         white : profile.id
                                     }
@@ -95,7 +96,20 @@ export default function Lobby(){
                                 navigate('/room',{
                                     state : {
                                         profile : profile,
-                                        roomInfo : res.data[i]
+                                        roomInfo : {
+                                            roomid : roomInfo.roomid,
+                                            roomname : roomInfo.roomname,
+                                            player_first : roomInfo.player_first,
+                                            player_second : profile.id,
+                                            black : roomInfo.player_first === roomInfo.black ? roomInfo.player_first : profile.id,
+                                            white :  roomInfo.player_first === roomInfo.white ? roomInfo.player_first : profile.id,
+                                            ready_first : roomInfo.ready_first,
+                                            ready_second : roomInfo.ready_second,
+                                            turn : roomInfo.turn,
+                                            board_num : roomInfo.board_num,
+                                            first_time : roomInfo.first_time,
+                                            second_time : roomInfo.second_time
+                                        }
                                     }
                                 })
                             }}>
@@ -167,6 +181,14 @@ export default function Lobby(){
                     })
                     navigate('/')
                 }}>Logout</p>
+
+                <p onClick={() => {
+                    navigate('/update', {
+                        state : {
+                            profile : profile
+                        }
+                    })
+                }}>Update</p>
             </div>
 
             <div id='profileBox'>
@@ -194,10 +216,24 @@ export default function Lobby(){
                                         white : profile.id
                                     }
                                 })
+                                let roomInfo = res.data[0];
                                 navigate('/room', {
                                     state : {
                                         profile : profile,
-                                        roomInfo : res.data[0]
+                                        roomInfo : {
+                                            roomid : roomInfo.roomid,
+                                            roomname : roomInfo.roomname,
+                                            player_first : roomInfo.player_first,
+                                            player_second : profile.id,
+                                            black : roomInfo.player_first === roomInfo.black ? roomInfo.player_first : profile.id,
+                                            white :  roomInfo.player_first === roomInfo.white ? roomInfo.player_first : profile.id,
+                                            ready_first : roomInfo.ready_first,
+                                            ready_second : roomInfo.ready_second,
+                                            turn : roomInfo.turn,
+                                            board_num : roomInfo.board_num,
+                                            first_time : roomInfo.first_time,
+                                            second_time : roomInfo.second_time
+                                        }
                                     }
                                 });
                             })
@@ -262,6 +298,7 @@ export default function Lobby(){
                             return
                         if(event.code === 'Enter'){
                             let time = new Date();
+                            
                             axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}chat`, {
                                 data : {
                                     id : profile.id,

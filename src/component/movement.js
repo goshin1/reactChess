@@ -32,7 +32,6 @@ const move_chess = {    // 각 말별로 이동 규칙 : 이동 규칙이나 범
         if(Number(position[0]) + 1 <= 8 && Number(position[1]) - 1 >= 1){
             crossLeft = document.getElementById(`chessCol${Number(position[0]) + 1}-${Number(position[1]) - 1}`);
         }
-
         chessClear();
         if(position[0] === '2'){    // 처음 움직이는 폰일 경우
             if(document.getElementById(`chessCol3-${Number(position[1])}`).children.length === 0){
@@ -41,16 +40,20 @@ const move_chess = {    // 각 말별로 이동 규칙 : 이동 규칙이나 범
             if(document.getElementById(`chessCol4-${Number(position[1])}`).children.length === 0){
                 document.getElementById(`chessCol4-${Number(position[1])}`).style.background = 'red';
             }
-        } else if(position[0] === '8'){ // 마지막 라인에 갔을 때 말 바꾸기
-
+        } else if(position[0] === '8' || position[0] === '1'){ // 마지막 라인에 갔을 때 말 바꾸기
+            console.log('sucess')
         } else if((crossRight?.children.length === 1 && crossRight?.children[0].getAttribute('id').includes('white')) || (crossLeft?.children.length === 1 && crossLeft?.children[0].getAttribute('id').includes('white'))){
             // 대각선 상의 상대 말이 있을 경우
-            if(crossRight.children.length === 1 && crossRight.children[0].getAttribute('id').includes('white') && crossRight.getAttribute('id') !== `chessCol${Number(position[0]) + 1}-${Number(position[1])}`){
-                crossRight.style.background = 'red'; 
+            if(crossRight !== undefined){
+                if(crossRight.children.length === 1 && crossRight.children[0].getAttribute('id').includes('white') && crossRight.getAttribute('id') !== `chessCol${Number(position[0]) + 1}-${Number(position[1])}`){
+                    crossRight.style.background = 'red'; 
+                }
             }
-            if(crossLeft.children.length === 1 && crossLeft.children[0].getAttribute('id').includes('white') && crossLeft.getAttribute('id') !== `chessCol${Number(position[0]) + 1}-${Number(position[1])}`){
-                crossLeft.style.background = 'red'; 
-            } 
+            if(crossLeft !== undefined){
+                if(crossLeft.children.length === 1 && crossLeft.children[0].getAttribute('id').includes('white') && crossLeft.getAttribute('id') !== `chessCol${Number(position[0]) + 1}-${Number(position[1])}`){
+                    crossLeft.style.background = 'red'; 
+                } 
+            }
         } else {    // 그외의 경우
             document.getElementById(`chessCol${Number(position[0]) + 1}-${Number(position[1])}`).style.background = 'red';
         }
@@ -61,26 +64,42 @@ const move_chess = {    // 각 말별로 이동 규칙 : 이동 규칙이나 범
         
         chessClear();
         for(let i = Number(position[0]) + 1; i <= 8; i++){
-            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0)
+            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0 && document.getElementById(`chessCol${i}-${position[1]}`).children[0]?.getAttribute('id').includes('black'))
                 break
+            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0 && document.getElementById(`chessCol${i}-${position[1]}`).children[0]?.getAttribute('id').includes('white')){
+                document.getElementById(`chessCol${i}-${position[1]}`).style.background = 'red';
+                break
+            }
             document.getElementById(`chessCol${i}-${position[1]}`).style.background = 'red';
         }
 
         for(let i = Number(position[0]) - 1; i > 0; i--){
-            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0)
+            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0 && document.getElementById(`chessCol${i}-${position[1]}`).children[0]?.getAttribute('id').includes('black'))
                 break
+            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0 && document.getElementById(`chessCol${i}-${position[1]}`).children[0]?.getAttribute('id').includes('white')){
+                document.getElementById(`chessCol${i}-${position[1]}`).style.background = 'red';
+                break
+            }
             document.getElementById(`chessCol${i}-${position[1]}`).style.background = 'red';
         }
 
         for(let i = Number(position[1]) + 1; i <= 8; i++){
-            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0)
+            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0 && document.getElementById(`chessCol${position[0]}-${i}`).children[0]?.getAttribute('id').includes('black'))
                 break
+            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0 && document.getElementById(`chessCol${position[0]}-${i}`).children[0]?.getAttribute('id').includes('black')){
+                document.getElementById(`chessCol${position[0]}-${i}`).style.background = 'red';
+                break
+            }
             document.getElementById(`chessCol${position[0]}-${i}`).style.background = 'red';
         }
 
         for(let i = Number(position[1]) - 1; i > 0; i--){
-            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0)
+            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0 && document.getElementById(`chessCol${position[0]}-${i}`).children[0]?.getAttribute('id').includes('black'))
                 break
+            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0 && document.getElementById(`chessCol${position[0]}-${i}`).children[0]?.getAttribute('id').includes('black')){
+                document.getElementById(`chessCol${position[0]}-${i}`).style.background = 'red';
+                break
+            }
             document.getElementById(`chessCol${position[0]}-${i}`).style.background = 'red';
         }
 
@@ -187,26 +206,42 @@ const move_chess = {    // 각 말별로 이동 규칙 : 이동 규칙이나 범
         chessClear();
         // 직선 이동
         for(let i = Number(position[0]) + 1; i <= 8; i++){
-            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0)
+            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0 && document.getElementById(`chessCol${i}-${position[1]}`).children[0]?.getAttribute('id').includes('black'))
                 break
+            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0 && document.getElementById(`chessCol${i}-${position[1]}`).children[0]?.getAttribute('id').includes('white')){
+                document.getElementById(`chessCol${i}-${position[1]}`).style.background = 'red';
+                break
+            }
             document.getElementById(`chessCol${i}-${position[1]}`).style.background = 'red';
         }
 
         for(let i = Number(position[0]) - 1; i > 0; i--){
-            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0)
+            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0 && document.getElementById(`chessCol${i}-${position[1]}`).children[0]?.getAttribute('id').includes('black'))
                 break
+            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0 && document.getElementById(`chessCol${i}-${position[1]}`).children[0]?.getAttribute('id').includes('white')){
+                document.getElementById(`chessCol${i}-${position[1]}`).style.background = 'red';
+                break
+            }
             document.getElementById(`chessCol${i}-${position[1]}`).style.background = 'red';
         }
 
         for(let i = Number(position[1]) + 1; i <= 8; i++){
-            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0)
+            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0 && document.getElementById(`chessCol${position[0]}-${i}`).children[0]?.getAttribute('id').includes('black'))
                 break
+            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0 && document.getElementById(`chessCol${position[0]}-${i}`).children[0]?.getAttribute('id').includes('white')){
+                document.getElementById(`chessCol${position[0]}-${i}`).style.background = 'red';
+                break
+            }
             document.getElementById(`chessCol${position[0]}-${i}`).style.background = 'red';
         }
 
         for(let i = Number(position[1]) - 1; i > 0; i--){
-            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0)
+            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0 && document.getElementById(`chessCol${position[0]}-${i}`).children[0]?.getAttribute('id').includes('black'))
                 break
+            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0 && document.getElementById(`chessCol${position[0]}-${i}`).children[0]?.getAttribute('id').includes('black')){
+                document.getElementById(`chessCol${position[0]}-${i}`).style.background = 'red';
+                break
+            }
             document.getElementById(`chessCol${position[0]}-${i}`).style.background = 'red';
         }
 
@@ -303,6 +338,8 @@ const move_chess = {    // 각 말별로 이동 규칙 : 이동 규칙이나 범
         if(Number(position[0]) - 1 >= 1 && Number(position[1]) - 1 >= 1){
             crossLeft = document.getElementById(`chessCol${Number(position[0]) - 1}-${Number(position[1]) - 1}`);
         }
+        console.log(`chessCol${Number(position[0]) - 1}-${Number(position[1]) + 1}`)
+        console.log(`chessCol${Number(position[0]) - 1}-${Number(position[1]) - 1}`)
         // 폰 코드 수정하기
         chessClear();
         if(position[0] === '7'){    // 처음 움직이는 폰일 경우
@@ -312,16 +349,20 @@ const move_chess = {    // 각 말별로 이동 규칙 : 이동 규칙이나 범
             if(document.getElementById(`chessCol5-${Number(position[1])}`).children.length === 0){
                 document.getElementById(`chessCol5-${Number(position[1])}`).style.background = 'red';
             }
-        } else if(position[0] === '8'){ // 마지막 라인에 갔을 때 말 바꾸기
-
+        } else if(position[0] === '8' || position[0] === '1'){ // 마지막 라인에 갔을 때 말 바꾸기
+            console.log('sucess')
         } else if((crossRight?.children.length === 1 && crossRight?.children[0].getAttribute('id').includes('black')) || (crossLeft?.children.length === 1 && crossLeft?.children[0].getAttribute('id').includes('black'))){
             // 대각선 상의 상대 말이 있을 경우
-            if(crossRight.children.length === 1 && crossRight.children[0].getAttribute('id').includes('black') && crossRight.getAttribute('id') !== `chessCol${Number(position[0]) + 1}-${Number(position[1])}`){
-                crossRight.style.background = 'red'; 
+            if(crossRight !== undefined){
+                if(crossRight.children.length === 1 && crossRight.children[0].getAttribute('id').includes('black') && crossRight.getAttribute('id') !== `chessCol${Number(position[0]) + 1}-${Number(position[1])}`){
+                    crossRight.style.background = 'red'; 
+                }
             }
-            if(crossLeft.children.length === 1 && crossLeft.children[0].getAttribute('id').includes('black') && crossLeft.getAttribute('id') !== `chessCol${Number(position[0]) + 1}-${Number(position[1])}`){
-                crossLeft.style.background = 'red'; 
-            } 
+            if(crossLeft !== undefined){
+                if(crossLeft.children.length === 1 && crossLeft.children[0].getAttribute('id').includes('black') && crossLeft.getAttribute('id') !== `chessCol${Number(position[0]) + 1}-${Number(position[1])}`){
+                    crossLeft.style.background = 'red'; 
+                } 
+            }
         } else {    // 그외의 경우
             document.getElementById(`chessCol${Number(position[0]) - 1}-${Number(position[1])}`).style.background = 'red';
         }
@@ -331,26 +372,42 @@ const move_chess = {    // 각 말별로 이동 규칙 : 이동 규칙이나 범
         const position = parent.getAttribute('id').replace('chessCol','').split('-')
         chessClear();
         for(let i = Number(position[0]) + 1; i <= 8; i++){
-            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0)
+            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0 && document.getElementById(`chessCol${i}-${position[1]}`).children[0]?.getAttribute('id').includes('white'))
                 break
+            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0 && document.getElementById(`chessCol${i}-${position[1]}`).children[0]?.getAttribute('id').includes('black')){
+                document.getElementById(`chessCol${i}-${position[1]}`).style.background = 'red';
+                break
+            }
             document.getElementById(`chessCol${i}-${position[1]}`).style.background = 'red';
         }
 
         for(let i = Number(position[0]) - 1; i > 0; i--){
-            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0)
+            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0 && document.getElementById(`chessCol${i}-${position[1]}`).children[0]?.getAttribute('id').includes('white'))
                 break
+            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0 && document.getElementById(`chessCol${i}-${position[1]}`).children[0]?.getAttribute('id').includes('black')){
+                document.getElementById(`chessCol${i}-${position[1]}`).style.background = 'red';
+                break
+            }
             document.getElementById(`chessCol${i}-${position[1]}`).style.background = 'red';
         }
 
         for(let i = Number(position[1]) + 1; i <= 8; i++){
-            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0)
+            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0 && document.getElementById(`chessCol${position[0]}-${i}`).children[0]?.getAttribute('id').includes('white'))
                 break
+            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0 && document.getElementById(`chessCol${position[0]}-${i}`).children[0]?.getAttribute('id').includes('black')){
+                document.getElementById(`chessCol${position[0]}-${i}`).style.background = 'red';
+                break
+            }
             document.getElementById(`chessCol${position[0]}-${i}`).style.background = 'red';
         }
 
         for(let i = Number(position[1]) - 1; i > 0; i--){
-            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0)
+            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0 && document.getElementById(`chessCol${position[0]}-${i}`).children[0]?.getAttribute('id').includes('white'))
                 break
+            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0 && document.getElementById(`chessCol${position[0]}-${i}`).children[0]?.getAttribute('id').includes('black')){
+                document.getElementById(`chessCol${position[0]}-${i}`).style.background = 'red';
+                break
+            }
             document.getElementById(`chessCol${position[0]}-${i}`).style.background = 'red';
         }
     },
@@ -453,26 +510,42 @@ const move_chess = {    // 각 말별로 이동 규칙 : 이동 규칙이나 범
         chessClear();
         // 직선 이동
         for(let i = Number(position[0]) + 1; i <= 8; i++){
-            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0)
+            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0 && document.getElementById(`chessCol${i}-${position[1]}`).children[0]?.getAttribute('id').includes('white'))
                 break
+            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0 && document.getElementById(`chessCol${i}-${position[1]}`).children[0]?.getAttribute('id').includes('black')){
+                document.getElementById(`chessCol${i}-${position[1]}`).style.background = 'red';
+                break
+            }
             document.getElementById(`chessCol${i}-${position[1]}`).style.background = 'red';
         }
 
         for(let i = Number(position[0]) - 1; i > 0; i--){
-            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0)
+            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0 && document.getElementById(`chessCol${i}-${position[1]}`).children[0]?.getAttribute('id').includes('white'))
                 break
+            if(document.getElementById(`chessCol${i}-${position[1]}`).children.length > 0 && document.getElementById(`chessCol${i}-${position[1]}`).children[0]?.getAttribute('id').includes('black')){
+                document.getElementById(`chessCol${i}-${position[1]}`).style.background = 'red';
+                break
+            }
             document.getElementById(`chessCol${i}-${position[1]}`).style.background = 'red';
         }
 
         for(let i = Number(position[1]) + 1; i <= 8; i++){
-            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0)
+            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0 && document.getElementById(`chessCol${position[0]}-${i}`).children[0]?.getAttribute('id').includes('white'))
                 break
+            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0 && document.getElementById(`chessCol${position[0]}-${i}`).children[0]?.getAttribute('id').includes('black')){
+                document.getElementById(`chessCol${position[0]}-${i}`).style.background = 'red';
+                break
+            }
             document.getElementById(`chessCol${position[0]}-${i}`).style.background = 'red';
         }
 
         for(let i = Number(position[1]) - 1; i > 0; i--){
-            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0)
+            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0 && document.getElementById(`chessCol${position[0]}-${i}`).children[0]?.getAttribute('id').includes('white'))
                 break
+            if(document.getElementById(`chessCol${position[0]}-${i}`).children.length > 0 && document.getElementById(`chessCol${position[0]}-${i}`).children[0]?.getAttribute('id').includes('black')){
+                document.getElementById(`chessCol${position[0]}-${i}`).style.background = 'red';
+                break
+            }
             document.getElementById(`chessCol${position[0]}-${i}`).style.background = 'red';
         }
 

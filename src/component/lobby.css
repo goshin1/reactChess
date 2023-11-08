@@ -14,11 +14,19 @@
 
 #lobbyHead{
     width: 100%;
-    text-align: right;
+    height: 30px;
 }
 
 #lobbyHead > p{
     cursor: pointer;
+}
+
+#lobbyHead > p:nth-child(1){
+    float: right;
+}
+
+#lobbyHead > p:nth-child(2){
+    float: left;
 }
 
 #profileBox{

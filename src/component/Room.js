@@ -15,25 +15,14 @@ export default function Room(){
     const [room, setRoom] = useState();
     const [ban, setBan] = useState(0);
     
-    // console.log(roomInfo);
 
-    // {   profile
-    //     "id": "manager",
-    //     "nickname": "manager",
-    //     "levels": 1,
-    //     "lose": 0,
-    //     "wins": 0
-    // }
-
-    // {   roomInfo
-    //     "roomid": 1,
-    //     "roomname": "sad",
-    //     "player_first": "manager",
-    //     "player_second": "none",
-    //     "black": "manager",
-    //     "white": "none",
-    //     "board_num": 1
-    // }
+    if(roomInfo.player_second === 'none' && roomInfo.player_first !== profile.id){
+        navigate('/lobby', {
+            state : {
+                profile : profile
+            }
+        })
+    }
 
     const useInterval = (callback, delay) => {
         const savedCallback = useRef(); 
@@ -165,7 +154,7 @@ export default function Room(){
         </div>
         <div id='room'>
             <div id='roomHead'>
-                <div id='roomTitle'>초보환영</div>
+                <div id='roomTitle'>{roomInfo.roomname}</div>
                 <input id='exitRoom' type='button' onClick={() => {
                     if(roomInfo.player_second === profile.id){ // 두번째 플레이어로서 나갈 경우
                         axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}exitRoom`, {
@@ -329,6 +318,8 @@ export default function Room(){
                             return
                         if(event.code === 'Enter'){
                             let time = new Date();
+                            console.log(time.getFullYear() + '/' + (time.getMonth() + 1) + "/" + time.getDay() + " " +
+                            time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds())
                             axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}chat`, {
                                 data : {
                                     id : profile.id,

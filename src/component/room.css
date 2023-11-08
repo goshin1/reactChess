@@ -132,6 +132,7 @@
     height: 50%;
     border: none;
     border-radius: 5px;
+    cursor: pointer;
 }
 
 .chessColor:after{
