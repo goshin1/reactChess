@@ -17,17 +17,42 @@
     height: 30px;
 }
 
-#lobbyHead > p{
+#lobbyHead > div{
+    width: 33.33%;
+    cursor: pointer;
+    float: left;
+    text-align: center;
     cursor: pointer;
 }
 
-#lobbyHead > p:nth-child(1){
+/* #lobbyHead > div:nth-child(1){
     float: right;
 }
 
-#lobbyHead > p:nth-child(2){
+#lobbyHead > div:nth-child(3){
     float: left;
+    margin-top: -10px;
+} */
+
+#matchingBot{
+    margin : 0px auto;
+    height: 25px;
 }
+
+#matchingBot input[type=button]{
+    cursor: pointer;
+    margin: 0px auto;
+    width: 100%;
+    max-width: 200px;
+    height: 30px;
+    border-radius: 5px;
+    display: block;
+    background-color: rgb(57, 57, 57);
+    border: 1px solid rgb(255, 255, 255);
+    color: rgb(255, 255, 255);
+    
+}
+
 
 #profileBox{
     margin: 50px auto 20px;
@@ -81,7 +106,7 @@
 }
 
 #createRoom{
-    margin-top: 20px;
+    margin-top: 0px;
     width: 100%;
     height: 80px;
 }

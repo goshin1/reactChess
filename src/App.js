@@ -1,6 +1,6 @@
 import { Route, Routes, BrowserRouter } from 'react-router-dom'
 import './App.css';
-import Play from './component/Play';
+import PlayBot from './component/PlayBot';
 import PlayUp from './component/PlayUp';
 import Lobby from './component/Lobby';
 import Login from './component/Login';
@@ -20,7 +20,7 @@ function App() {
           <Route path='/lobby' exact element={<Lobby></Lobby>}></Route>
           <Route path='/room' exact element={<Room></Room>}></Route>
           <Route path='/play' exact element={<PlayUp></PlayUp>}></Route>
-          <Route path='/before' exact element={<Play></Play>}></Route>
+          <Route path='/playBot' exact element={<PlayBot></PlayBot>}></Route>
           <Route path='/exit' exact element={<Exit></Exit>}></Route>
           <Route path='/update' exact element={<Update></Update>}></Route>
         </Routes>

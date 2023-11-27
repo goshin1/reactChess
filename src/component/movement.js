@@ -338,8 +338,6 @@ const move_chess = {    // 각 말별로 이동 규칙 : 이동 규칙이나 범
         if(Number(position[0]) - 1 >= 1 && Number(position[1]) - 1 >= 1){
             crossLeft = document.getElementById(`chessCol${Number(position[0]) - 1}-${Number(position[1]) - 1}`);
         }
-        console.log(`chessCol${Number(position[0]) - 1}-${Number(position[1]) + 1}`)
-        console.log(`chessCol${Number(position[0]) - 1}-${Number(position[1]) - 1}`)
         // 폰 코드 수정하기
         chessClear();
         if(position[0] === '7'){    // 처음 움직이는 폰일 경우

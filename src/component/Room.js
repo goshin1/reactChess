@@ -94,20 +94,37 @@ export default function Room(){
         setColor([roomInfo.player_first === roomInfo.black ? false : true, roomInfo.player_second === roomInfo.black ? false : true])
         
         if(ready[0] === true && ready[1] === true){
-            let endTime = parseInt(new Date().getTime() / 1000);
-            axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}timeUpdate`, {
-                data : {
-                    who : profile.id === roomInfo.player_first ? 1 : 2,
-                    roomid : roomInfo.roomid,
-                    endTime : endTime
-                }
-            })
-            navigate('/play', {
-                state : {
-                    profile : profile,
-                    roomInfo : roomInfo
-                }
-            })
+            if(roomInfo.player_second !== 'Aibot'){
+                let endTime = parseInt(new Date().getTime() / 1000);
+                axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}timeUpdate`, {
+                    data : {
+                        who : profile.id === roomInfo.player_first ? 1 : 2,
+                        roomid : roomInfo.roomid,
+                        endTime : endTime
+                    }
+                })
+                navigate('/play', {
+                    state : {
+                        profile : profile,
+                        roomInfo : roomInfo
+                    }
+                })
+            }else{
+                let endTime = parseInt(new Date().getTime() / 1000);
+                axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}timeUpdate`, {
+                    data : {
+                        who : profile.id === roomInfo.player_first ? 1 : 2,
+                        roomid : roomInfo.roomid,
+                        endTime : endTime
+                    }
+                })
+                navigate('/playBot', {
+                    state : {
+                        profile : profile,
+                        roomInfo : roomInfo
+                    }
+                })
+            }
         }
     }, [500]);
     const black = {
@@ -162,7 +179,8 @@ export default function Room(){
                                 player_first : roomInfo.player_first,
                                 player_second : 'none',
                                 roomid : roomInfo.roomid,
-                                board_num : roomInfo.board_num
+                                board_num : roomInfo.board_num,
+                                viewname : roomInfo.viewname
                             }
                         })
                     }else if(roomInfo.player_first === profile.id && roomInfo.player_second !== 'none'){ // 첫 번째 플레이어고 
@@ -171,7 +189,8 @@ export default function Room(){
                                 player_first : 'none',
                                 player_second : roomInfo.player_second,
                                 roomid : roomInfo.roomid,
-                                board_num : roomInfo.board_num
+                                board_num : roomInfo.board_num,
+                                viewname : roomInfo.viewname
                             }
                         })
                     }else if(roomInfo.player_first === profile.id && roomInfo.player_second === 'none'){
@@ -180,7 +199,8 @@ export default function Room(){
                                 player_first : 'none',
                                 player_second : 'none',
                                 roomid : roomInfo.roomid,
-                                board_num : roomInfo.board_num
+                                board_num : roomInfo.board_num,
+                                viewname : roomInfo.viewname
                             }
                         })
                     }

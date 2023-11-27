@@ -173,22 +173,49 @@ export default function Lobby(){
         </div>
         <div id='lobby'>
             <div id='lobbyHead'>
-                <p onClick={() => {
+                <div onClick={() => {
                     axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}logout`, {
                         data : {
                             id : profile.id
                         }
                     })
                     navigate('/')
-                }}>Logout</p>
-
-                <p onClick={() => {
+                }}>Logout</div>
+                <div id='matchingBot'>
+                        <input type='button' value='연습전' onClick={()=>{
+                            let roomName = '연습전';
+                            let date = new Date();
+                            axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}createRoom`, {
+                                data : {
+                                    id : profile.id,
+                                    roomName : roomName,
+                                    board : "{" + String(board) + "}" === "{}" ? '{0}' : "{" + String(board) + "}",
+                                    time : parseInt(date.getTime() / 1000)
+                                }
+                            }).then((res) => {
+                                axios.post(`${process.env.REACT_APP_ROUTER_CHESS_HOST}insertBot`, {
+                                    data : {
+                                        roomid : res.data.roomid
+                                    }
+                                })
+                                if(res.data !== 'fail'){
+                                    navigate('/room', {
+                                        state : {
+                                            profile : profile,
+                                            roomInfo : res.data
+                                        }
+                                    });
+                                }
+                            })
+                        }}/>
+                    </div>
+                <div onClick={() => {
                     navigate('/update', {
                         state : {
                             profile : profile
                         }
                     })
-                }}>Update</p>
+                }}>Update</div>
             </div>
 
             <div id='profileBox'>
@@ -196,6 +223,7 @@ export default function Lobby(){
                     <div id='profileDetail'>
                         {profile.levels}Lv {profile.id}
                     </div>
+                    
                     <div id='profileRecord'>
                         <div id='levelsBar'>
                             {levels}
